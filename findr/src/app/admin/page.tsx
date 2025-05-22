@@ -11,7 +11,7 @@ interface Item {
   found_when: string
   finder_details: string
   claimed: boolean
-  imageUrl: string // base64 or URL string for image
+  imageUrl: string
 }
 
 export default function AdminPage() {
@@ -19,44 +19,37 @@ export default function AdminPage() {
   const username = searchParams.get('username') || 'User'
 
   const [items, setItems] = useState<Item[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchItems() {
       try {
         const res = await fetch('/api/admin')
-        if (!res.ok) {
-          throw new Error(`Failed to fetch items: ${res.status}`)
-        }
+        if (!res.ok) throw new Error(`Failed to fetch items: ${res.status}`)
         const data: Item[] = await res.json()
         setItems(data)
-      } catch (error) {
-        console.error('Error fetching items:', error)
+      } catch (err) {
+        console.error(err)
         setError('Failed to load items.')
       } finally {
         setLoading(false)
       }
     }
-
     fetchItems()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-gray-500 text-lg">Loading items...</p>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <p className="text-gray-500 text-lg">Loading items...</p>
+    </div>
+  )
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-red-600 text-lg">{error}</p>
-      </div>
-    )
-  }
+  if (error) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <p className="text-red-600 text-lg">{error}</p>
+    </div>
+  )
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center p-4 sm:p-6 md:p-10">
@@ -69,7 +62,6 @@ export default function AdminPage() {
             </span>
             <button
               onClick={() => {
-                // Add your logout logic here, e.g. redirect to login page
                 window.location.href = '/login'
               }}
               className="inline-block px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md"
@@ -82,8 +74,7 @@ export default function AdminPage() {
         <div className="mb-4">
           <button
             onClick={() => {
-              // Redirect or open your create entry page
-              window.location.href = '/create'
+              window.location.href = `/create?username=${encodeURIComponent(username)}`
             }}
             className="inline-block px-5 py-2 bg-amber-300 hover:bg-amber-400 text-gray-900 font-semibold rounded-md"
           >
@@ -106,8 +97,18 @@ export default function AdminPage() {
               </tr>
             </thead>
             <tbody>
+              {items.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="text-center p-4 text-gray-500">
+                    No items found.
+                  </td>
+                </tr>
+              )}
               {items.map((item, idx) => (
-                <tr key={item.item_id} className={idx % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'hover:bg-gray-100'}>
+                <tr
+                  key={item.item_id}
+                  className={idx % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'hover:bg-gray-100'}
+                >
                   <td className="px-4 py-2 border border-gray-300">
                     <img
                       src={item.imageUrl}
@@ -125,7 +126,7 @@ export default function AdminPage() {
                   <td className="px-4 py-2 border border-gray-300 text-center space-x-2">
                     <button
                       onClick={() => {
-                        window.location.href = `/edit?id=${item.item_id}`
+                        window.location.href = `/edit?id=${item.item_id}&username=${encodeURIComponent(username)}`
                       }}
                       className="inline-block px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm"
                     >
@@ -134,7 +135,7 @@ export default function AdminPage() {
                     <button
                       onClick={() => {
                         if (confirm('Are you sure you want to delete this entry?')) {
-                          window.location.href = `/delete?id=${item.item_id}`
+                          window.location.href = `/delete?id=${item.item_id}&username=${encodeURIComponent(username)}`
                         }
                       }}
                       className="inline-block px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm"
@@ -144,13 +145,6 @@ export default function AdminPage() {
                   </td>
                 </tr>
               ))}
-              {items.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="text-center p-4 text-gray-500">
-                    No items found.
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
