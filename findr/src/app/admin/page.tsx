@@ -39,6 +39,25 @@ export default function AdminPage() {
     fetchItems()
   }, [])
 
+  async function handleDelete(item_id: number) {
+    const confirmed = confirm('Are you sure you want to delete this entry?')
+    if (!confirmed) return
+
+    try {
+      const res = await fetch('/api/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_id }),
+      })
+
+      if (!res.ok) throw new Error('Delete failed')
+      setItems(prev => prev.filter(item => item.item_id !== item_id))
+    } catch (err) {
+      console.error(err)
+      alert('Failed to delete the item.')
+    }
+  }
+
   if (loading) return (
     <div className="flex justify-center items-center min-h-screen">
       <p className="text-gray-500 text-lg">Loading items...</p>
@@ -133,11 +152,7 @@ export default function AdminPage() {
                       Edit
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm('Are you sure you want to delete this entry?')) {
-                          window.location.href = `/delete?id=${item.item_id}&username=${encodeURIComponent(username)}`
-                        }
-                      }}
+                      onClick={() => handleDelete(item.item_id)}
                       className="inline-block px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm"
                     >
                       Delete
