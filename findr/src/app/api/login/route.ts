@@ -33,9 +33,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
     }
 
-    return NextResponse.json({ message: 'Login successful' })
+    // Return username on success
+    return NextResponse.json({ message: 'Login successful', username: user.username })
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
+

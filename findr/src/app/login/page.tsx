@@ -24,7 +24,8 @@ export default function LoginPage() {
       if (!res.ok) {
         setErrorMsg(data.error || 'Login failed: Invalid username or password.')
       } else {
-        router.push('/')
+        // Use username from API response, not the input
+        router.push(`/admin?username=${encodeURIComponent(data.username)}`)
       }
     } catch (err) {
       setErrorMsg('Login failed: Something went wrong.')
@@ -32,11 +33,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-4 sm:p-6 md:p-10">
+    <div className="bg-muted flex min-h-screen flex-col items-center justify-center gap-6 p-4 sm:p-6 md:p-10">
       <div className="flex w-[90%] max-w-[340px] flex-col gap-6 bg-white pt-8 pb-10 px-4 sm:pt-10 sm:pb-12 sm:px-6 rounded-lg shadow-lg">
-        <a href="#" className="flex items-center text-2xl font-bold gap-2 self-center">
-          Findr Admin Center
-        </a>
+        <h1 className="text-2xl font-bold self-center">Findr Admin Center</h1>
 
         <form onSubmit={handleSubmit}>
           <label htmlFor="username" className="block text-gray-700 font-semibold mb-2">
@@ -77,6 +76,16 @@ export default function LoginPage() {
             </p>
           )}
         </form>
+
+        {/* Back link styled like home footer */}
+        <div className="text-center text-[15px] mt-6">
+          <a
+            href="/"
+            className="underline cursor-pointer text-gray-700"
+          >
+            Back
+          </a>
+        </div>
       </div>
     </div>
   )
