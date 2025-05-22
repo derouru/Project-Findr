@@ -21,7 +21,7 @@ export default function CreatePage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -73,15 +73,18 @@ export default function CreatePage() {
         <label htmlFor="box_location" className="block font-semibold mb-1 text-gray-700">
           Box Location
         </label>
-        <input
-          type="text"
+        <select
           id="box_location"
           name="box_location"
           value={formData.box_location}
           onChange={handleChange}
           required
           className="w-full border px-3 py-2 rounded text-gray-800"
-        />
+        >
+          <option value="" disabled>Select a location</option>
+          <option value="NIGS-1">NIGS-1</option>
+          <option value="AECH-1">AECH-1</option>
+        </select>
       </div>
 
       <div>
